@@ -6,7 +6,7 @@
 class Coordinate {
  public:
   Coordinate();
-  Coordinate(int row, int col, Color color);
+    Coordinate(int row, int col, Color color);
  private:
   int row, col;
   bool occupied;

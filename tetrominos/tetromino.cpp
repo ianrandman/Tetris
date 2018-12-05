@@ -1,9 +1,9 @@
 #include "tetromino.h"
 #include "coordinate.h"
 
-Tetromino::Tetromino() {
-  this->orientation = 1;
-}
+//Tetromino::Tetromino() {
+//  this->orientation = 1;
+//}
 
 /*const Coordinate** Tetromino::getLocalArray() {
     switch (this->orientation) {

@@ -6,7 +6,7 @@
 
 class Tetromino {
  public:
-  virtual const Coordinate **getCoordinateArray() = 0;
+  virtual const Coordinate *getCoordinateArray() = 0;
 
  protected:
   int orientation;
