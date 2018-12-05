@@ -20,6 +20,7 @@ class Color {
   static const Color Purple;
   static const Color Red;
   static const Color Black;
+  static const Color White;
 
   bool operator==(Color otherColor);
 

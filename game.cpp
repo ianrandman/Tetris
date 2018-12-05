@@ -22,6 +22,10 @@
 #include "tetrominos/color.h"
 #include "tetrominos/coordinate.h"
 
+#include <iostream>
+
+using namespace std;
+
 using rgb_matrix::GPIO;
 using rgb_matrix::RGBMatrix;
 using rgb_matrix::Canvas;
@@ -59,14 +63,16 @@ static void InterruptHandler(int signo) {
 //  }
 //}
 
-static Tetromino *getNextTetromino() {
-  int num = rand() % 7;
-  if (num == lastTetromino) {
-    num = rand() % 7;
-  }
-  lastTetromino = num;
+static Tetromino *getNextTetromino(int number) {
+//  int num = rand() % 7;
+//  if (num == lastTetromino) {
+//    num = rand() % 7;
+//  }
+//  lastTetromino = num;
 
-  switch (num) {
+  int num = 4;
+
+  switch (number) {
     case 0:
       return new ITetromino();
     case 1:
@@ -85,21 +91,35 @@ static Tetromino *getNextTetromino() {
 }
 
 static void playGame(Canvas *panel, Board *board) {
-  while (true) {
+  //board->printBoard();
+
+  for (int i = 0; i < 7; i++) {
     if (interrupt_received)
       return;
-    Tetromino *tetromino = getNextTetromino();
+    Tetromino *tetromino = getNextTetromino(i);
 
     board->spawnTetromino(tetromino);
     board->showBoard(tetromino, panel);
-    usleep(1000);
+
+    cout.flush();
+    usleep(100 * 1000);
     while (board->moveTetrominoDown(tetromino)) {
       if (interrupt_received)
         return;
       board->showBoard(tetromino, panel);
-      usleep(1000);
+      cout.flush();
+      usleep(100 * 1000);
     }
+
+    board->showBoard(tetromino, panel);
   }
+
+  while (true) {
+    if (interrupt_received)
+      return;
+  }
+
+//  board->printBoard();
 }
 
 static Canvas *setUpPanel(int argc, char *argv[]) {

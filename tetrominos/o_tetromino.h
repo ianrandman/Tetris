@@ -11,10 +11,10 @@ class OTetromino : public Tetromino {
  private:
   static const Color color;
 
-  static const int numRows = 4;
-  static const int numCols = 3;
+  static const int numRows = 3;
+  static const int numCols = 4;
 
-  static const Coordinate orientation1[numRows + numRows*numCols];
+  static const Coordinate orientation1[numRows*numCols];
 };
 
 #endif

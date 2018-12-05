@@ -22,6 +22,7 @@ class Line {
   void setTetrominoLocation(Tetromino *tetromino, int col);
   void setOccupied(Color color, int col);
   void showSpaces(Canvas *panel);
+  void printLine();
  private:
   int rowNum;
   Coordinate spaces[numSpaces];

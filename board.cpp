@@ -1,4 +1,7 @@
 #include "board.h"
+#include <iostream>
+
+using namespace std;
 
 Board::Board() {
   for (int row = 0; row < numRows; row++) {
@@ -22,17 +25,22 @@ bool Board::isCollision(Tetromino *tetromino) {
 
   for (int row = 0; row < numTetrominoRows; row++) {
     for (int col = 0; col < numTetrominoCols; col++) {
-      Coordinate tetrominoCoordinate = tetrominoCoordinateArray[row + row*col];
+      Coordinate tetrominoCoordinate = tetrominoCoordinateArray[col + row*numTetrominoCols];
+//      cout << "tetrominocoordinaterow: " << tetrominoCoordinate.getRow() << endl;
+//      cout << "tetrominocoordinatecol: " << tetrominoCoordinate.getCol() << endl;
+//      cout << "currentrow: " << currentRow << endl;
+//      cout << "currentcol: " << currentCol << endl;
+
       if (tetrominoCoordinate.isOccupied() &&
             (lines[currentRow + row].isOccupiedAt(currentCol + col) ||
-            tetrominoCoordinate.getCol() < 0 || tetrominoCoordinate.getCol() > Line::numSpaces ||
-            tetrominoCoordinate.getRow() > Board::numRows)) {
-        return false;
+            tetrominoCoordinate.getCol() + currentCol < 0 || tetrominoCoordinate.getCol() + currentCol > Line::numSpaces ||
+            tetrominoCoordinate.getRow() + currentRow > Board::numRows - 1)) {
+        return true;
       }
     }
   }
 
-  return true;
+  return false;
 }
 
 bool Board::moveTetrominoDown(Tetromino *tetromino) {
@@ -63,21 +71,26 @@ void Board::solidifyTetromino(Tetromino *tetromino) {
 
   for (int row = 0; row < numTetrominoRows; row++) {
     for (int col = 0; col < numTetrominoCols; col++) {
-      Coordinate tetrominoCoordinate = tetrominoCoordinateArray[row + row*col];
+      Coordinate tetrominoCoordinate = tetrominoCoordinateArray[col + row*numTetrominoCols];
       if (tetrominoCoordinate.isOccupied()) {
         lines[currentRow + row].setOccupied(tetrominoCoordinate.getColor(), currentCol + col);
       }
     }
   }
 
-  delete tetromino;
+  //delete tetromino;
 }
 
 void Board::showBoard(Tetromino *tetromino, Canvas *panel) {
   panel->Fill(0, 0, 0);
 
+  for (int col = 0; col < 11; col++) {
+    panel->SetPixel(col, 1, 255, 255, 255);
+  }
+
   for (int row = 2; row < Board::numRows; row++) {
     lines[row].showSpaces(panel);
+    panel->SetPixel(10, row, 255, 255, 255);
   }
 
   Coordinate currentTetrominoLocation = tetromino->getCurrentLocation();
@@ -91,11 +104,26 @@ void Board::showBoard(Tetromino *tetromino, Canvas *panel) {
 
   for (int row = 0; row < numTetrominoRows; row++) {
     for (int col = 0; col < numTetrominoCols; col++) {
-      Coordinate tetrominoCoordinate = tetrominoCoordinateArray[row + row*col];
+      Coordinate tetrominoCoordinate = tetrominoCoordinateArray[col + row*numTetrominoCols];
       if (tetrominoCoordinate.isOccupied()) {
         Color color = tetrominoCoordinate.getColor();
-        panel->SetPixel(currentCol + col, currentRow + row, color.getRed(), color.getBlue(), color.getGreen());
+        panel->SetPixel(currentCol + col, currentRow + row, color.getRed(), color.getGreen(), color.getBlue());
       }
     }
   }
+
+  for (int col = 0; col < 11; col++) {
+    panel->SetPixel(col, 22, 255, 255, 255);
+  }
+}
+
+void Board::printBoard() {
+  cout << "The board starts here:" << endl;
+  for (int row = 0; row < 22; row++) {
+    lines[row].printLine();
+    cout << endl;
+  }
+
+  cout << endl;
+  cout << endl;
 }
