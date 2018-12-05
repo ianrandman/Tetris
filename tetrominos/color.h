@@ -21,7 +21,7 @@ class Color {
   static const Color Red;
   static const Color Black;
 
-
+  bool operator==(Color otherColor);
 
  private:
   uint8_t r, g, b;

@@ -11,3 +11,11 @@ const Coordinate OTetromino::orientation1[numRows + numRows*numCols] = {
 const Coordinate *OTetromino::getCoordinateArray() {
   return orientation1;
 }
+
+const int OTetromino::getNumRows() {
+  return OTetromino::numRows;
+}
+
+const int OTetromino::getNumCols() {
+  return OTetromino::numCols;
+}

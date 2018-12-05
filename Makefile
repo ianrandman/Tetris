@@ -1,4 +1,4 @@
-	CXXFLAGS=-Wall -O3 -g
+CXXFLAGS=-Wall -O3 -g
 OBJECTS=game.o board.o line.o $(TETROMINODIR)/color.o $(TETROMINODIR)/coordinate.o $(TETROMINODIR)/i_tetromino.o \
 $(TETROMINODIR)/j_tetromino.o $(TETROMINODIR)/l_tetromino.o $(TETROMINODIR)/o_tetromino.o $(TETROMINODIR)/s_tetromino.o \
 $(TETROMINODIR)/t_tetromino.o $(TETROMINODIR)/tetromino.o $(TETROMINODIR)/z_tetromino.o
@@ -16,7 +16,7 @@ LDFLAGS+=-L$(RGB_LIBDIR) -l$(RGB_LIBRARY_NAME) -lrt -lm -lpthread
 all : game
 
 game : $(OBJECTS) $(RGB_LIBRARY)
-	$(CXX) -I$(TETROMINODIR) $(CXXFLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
+	$(CXX) -I$(TETROMINODIR) -I$(RGB_INCDIR) $(CXXFLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
 
 $(RGB_LIBRARY):
 	$(MAKE) -C $(RGB_LIBDIR)

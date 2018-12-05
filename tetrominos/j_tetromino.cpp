@@ -38,3 +38,11 @@ const Coordinate *JTetromino::getCoordinateArray() {
       return orientation4;
   }
 }
+
+const int JTetromino::getNumRows() {
+  return JTetromino::numRows;
+}
+
+const int JTetromino::getNumCols() {
+  return JTetromino::numCols;
+}

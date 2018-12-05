@@ -1,9 +1,17 @@
 #include "tetromino.h"
 #include "coordinate.h"
 
-//Tetromino::Tetromino() {
-//  this->orientation = 1;
-//}
+Tetromino::Tetromino() {
+  this->orientation = 1;
+}
+
+Coordinate Tetromino::getCurrentLocation() {
+  return currentLocation;
+}
+
+void Tetromino::setCurrentLocation(Coordinate location) {
+  currentLocation = location;
+}
 
 /*const Coordinate** Tetromino::getLocalArray() {
     switch (this->orientation) {

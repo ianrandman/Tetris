@@ -6,10 +6,17 @@
 
 class Tetromino {
  public:
-  virtual const Coordinate *getCoordinateArray() = 0;
+  Tetromino();
 
+  virtual const Coordinate *getCoordinateArray() = 0;
+  virtual const int getNumRows() = 0;
+  virtual const int getNumCols() = 0;
+
+  Coordinate getCurrentLocation();
+  void setCurrentLocation(Coordinate location);
  protected:
   int orientation;
+  Coordinate currentLocation;
 
 
  private:

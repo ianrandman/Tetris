@@ -38,3 +38,11 @@ const Coordinate *ZTetromino::getCoordinateArray() {
       return orientation4;
   }
 }
+
+const int ZTetromino::getNumRows() {
+  return ZTetromino::numRows;
+}
+
+const int ZTetromino::getNumCols() {
+  return ZTetromino::numCols;
+}

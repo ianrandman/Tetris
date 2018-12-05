@@ -42,3 +42,11 @@ const Coordinate *ITetromino::getCoordinateArray() {
       return orientation4;
   }
 }
+
+const int ITetromino::getNumRows() {
+  return ITetromino::numRows;
+}
+
+const int ITetromino::getNumCols() {
+  return ITetromino::numCols;
+}

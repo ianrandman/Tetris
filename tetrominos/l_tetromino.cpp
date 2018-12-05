@@ -38,3 +38,11 @@ const Coordinate *LTetromino::getCoordinateArray() {
       return orientation4;
   }
 }
+
+const int LTetromino::getNumRows() {
+  return LTetromino::numRows;
+}
+
+const int LTetromino::getNumCols() {
+  return LTetromino::numCols;
+}

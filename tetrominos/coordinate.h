@@ -6,7 +6,15 @@
 class Coordinate {
  public:
   Coordinate();
-    Coordinate(int row, int col, Color color);
+  Coordinate(int row, int col, Color color);
+
+  int getRow();
+  int getCol();
+  bool isOccupied();
+  void setOccupied();
+  Color getColor();
+  void setColor(Color color);
+
  private:
   int row, col;
   bool occupied;

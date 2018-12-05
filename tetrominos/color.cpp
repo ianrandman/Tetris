@@ -23,3 +23,7 @@ const Color Color::Green(0, 255, 0);
 const Color Color::Purple(128, 0, 128);
 const Color Color::Red(255, 0, 0);
 const Color Color::Black(0, 0, 0);
+
+bool Color::operator==(Color color) {
+  return this->r == color.r && this->g == color.g && this->b == color.b;
+}
