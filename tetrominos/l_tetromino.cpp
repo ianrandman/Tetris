@@ -46,3 +46,29 @@ const int LTetromino::getNumRows() {
 const int LTetromino::getNumCols() {
   return LTetromino::numCols;
 }
+
+void LTetromino::rotateLeft() {
+  switch (this->orientation) {
+    case 1:
+      this->orientation = 4;
+    case 2:
+      this->orientation = 1;
+    case 3:
+      this->orientation = 2;
+    default:
+      this->orientation = 3;
+  }
+}
+
+void LTetromino::rotateRight() {
+  switch (this->orientation) {
+    case 1:
+      this->orientation = 2;
+    case 2:
+      this->orientation = 3;
+    case 3:
+      this->orientation = 4;
+    default:
+      this->orientation = 1;
+  }
+}

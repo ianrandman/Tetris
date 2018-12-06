@@ -11,12 +11,12 @@ RGB_INCDIR=$(RGB_LIB_DISTRIBUTION)/include
 RGB_LIBDIR=$(RGB_LIB_DISTRIBUTION)/lib
 RGB_LIBRARY_NAME=rgbmatrix
 RGB_LIBRARY=$(RGB_LIBDIR)/lib$(RGB_LIBRARY_NAME).a
-LDFLAGS+=-L$(RGB_LIBDIR) -l$(RGB_LIBRARY_NAME) -lrt -lm -lpthread
+LDFLAGS+=-L$(RGB_LIBDIR) -l$(RGB_LIBRARY_NAME) -lrt -lm -lpthread -L/usr/local/lib -lwiringPi
 
 all : game
 
 game : $(OBJECTS) $(RGB_LIBRARY)
-	$(CXX) -I$(TETROMINODIR) -I$(RGB_INCDIR) $(CXXFLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
+	$(CXX) -I$(TETROMINODIR) -I$(RGB_INCDIR) -I/usr/local/include $(CXXFLAGS) $(OBJECTS) -o $@ $(LDFLAGS)
 
 $(RGB_LIBRARY):
 	$(MAKE) -C $(RGB_LIBDIR)

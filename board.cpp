@@ -33,8 +33,8 @@ bool Board::isCollision(Tetromino *tetromino) {
 
       if (tetrominoCoordinate.isOccupied() &&
             (lines[currentRow + row].isOccupiedAt(currentCol + col) ||
-            tetrominoCoordinate.getCol() + currentCol < 0 || tetrominoCoordinate.getCol() + currentCol > Line::numSpaces ||
-            tetrominoCoordinate.getRow() + currentRow > Board::numRows - 1)) {
+            tetrominoCoordinate.getCol() + currentCol < 0 || tetrominoCoordinate.getCol() + currentCol >= Line::numSpaces ||
+            tetrominoCoordinate.getRow() + currentRow >= Board::numRows)) {
         return true;
       }
     }
@@ -44,14 +44,17 @@ bool Board::isCollision(Tetromino *tetromino) {
 }
 
 bool Board::moveTetrominoDown(Tetromino *tetromino) {
-  Coordinate currentTetrominoLocation = tetromino->getCurrentLocation();
-  int currentRow = currentTetrominoLocation.getRow();
-  int currentCol = currentTetrominoLocation.getCol();
+//  Coordinate currentTetrominoLocation = tetromino->getCurrentLocation();
+//  int currentRow = currentTetrominoLocation.getRow();
+//  int currentCol = currentTetrominoLocation.getCol();
 
-  lines[currentRow + 1].setTetrominoLocation(tetromino, currentCol);
+//  lines[currentRow + 1].setTetrominoLocation(tetromino, currentCol);
+
+  tetromino->moveDown();
 
   if (isCollision(tetromino)) {
-    lines[currentRow].setTetrominoLocation(tetromino, currentCol);
+    //lines[currentRow].setTetrominoLocation(tetromino, currentCol);
+    tetromino->moveUp();
     solidifyTetromino(tetromino);
     return false;
   }
@@ -80,6 +83,30 @@ void Board::solidifyTetromino(Tetromino *tetromino) {
 
   //delete tetromino;
 }
+
+
+
+void Board::moveTetrominoLeft(Tetromino *tetromino) {
+  tetromino->moveLeft();
+
+  if (isCollision(tetromino)) {
+    //lines[currentRow].setTetrominoLocation(tetromino, currentCol);
+    tetromino->moveRight();
+  }
+}
+
+void Board::moveTetrominoRight(Tetromino *tetromino) {
+  tetromino->moveRight();
+
+  if (isCollision(tetromino)) {
+    //lines[currentRow].setTetrominoLocation(tetromino, currentCol);
+    tetromino->moveLeft();
+  }
+}
+
+
+
+
 
 void Board::showBoard(Tetromino *tetromino, Canvas *panel) {
   panel->Fill(0, 0, 0);

@@ -1,5 +1,6 @@
 
 #include "led-matrix.h"
+#include <wiringPi.h>
 
 #include <unistd.h>
 #include <math.h>
@@ -23,6 +24,7 @@
 #include "tetrominos/coordinate.h"
 
 #include <iostream>
+#include <thread>
 
 using namespace std;
 
@@ -31,6 +33,7 @@ using rgb_matrix::RGBMatrix;
 using rgb_matrix::Canvas;
 
 static int lastTetromino = -1;
+static Tetromino *currentTetromino;
 
 static void playGame(Canvas *panel, Board *board);
 static Canvas *setUpPanel(int argc, char *argv[]);
@@ -40,28 +43,6 @@ volatile bool interrupt_received = false;
 static void InterruptHandler(int signo) {
   interrupt_received = true;
 }
-
-//static void DrawOnCanvas(Canvas *canvas) {
-//  /*
-//   * Let's create a simple animation. We use the canvas to draw
-//   * pixels. We wait between each step to have a slower animation.
-//   */
-//  canvas->Fill(0, 0, 255);
-//
-//  int center_x = canvas->width() / 2;
-//  int center_y = canvas->height() / 2;
-//  float radius_max = canvas->width() / 2;
-//  float angle_step = 1.0 / 360;
-//  for (float a = 0, r = 0; r < radius_max; a += angle_step, r += angle_step) {
-//    if (interrupt_received)
-//      return;
-//    float dot_x = cos(a * 2 * M_PI) * r;
-//    float dot_y = sin(a * 2 * M_PI) * r;
-//    canvas->SetPixel(center_x + dot_x, center_y + dot_y,
-//                     255, 0, 0);
-//    usleep(1 * 1000);  // wait a little to slow down things.
-//  }
-//}
 
 static Tetromino *getNextTetromino(int number) {
 //  int num = rand() % 7;
@@ -90,34 +71,140 @@ static Tetromino *getNextTetromino(int number) {
   }
 }
 
+static void checkForMove(Canvas *panel, Board *board, Tetromino *tetromino) {
+while (tetromino == currentTetromino) {
+    if (digitalRead(28) == 0) {
+      board->moveTetrominoLeft(tetromino);
+      board->showBoard(tetromino, panel);
+      usleep(150 * 1000);
+    }
+
+    while (digitalRead(28) == 0 && tetromino == currentTetromino) {
+      if (digitalRead(29) == 0) {
+        break;
+      }
+
+      board->moveTetrominoLeft(tetromino);
+      board->showBoard(tetromino, panel);
+      usleep(150 * 1000);
+    }
+
+    if (digitalRead(29) == 0) {
+      board->moveTetrominoRight(tetromino);
+      board->showBoard(tetromino, panel);
+      usleep(150 * 1000);
+    }
+
+    while (digitalRead(29) == 0 && tetromino == currentTetromino) {
+      if (digitalRead(28) == 0) {
+        break;
+      }
+
+      board->moveTetrominoRight(tetromino);
+      board->showBoard(tetromino, panel);
+      usleep(62 * 1000);
+    }
+  }
+}
+
+static int moveLock = 0;
+static void checkForMoveLeft(Canvas *panel, Board *board, Tetromino *tetromino) {
+  bool canGrabMoveLock = true;
+
+  while (tetromino == currentTetromino) {
+    if (moveLock != 2 && canGrabMoveLock) {
+      if (digitalRead(28) == 0) {
+
+        moveLock = 1;
+        canGrabMoveLock = false;
+
+
+        board->moveTetrominoLeft(tetromino);
+        board->showBoard(tetromino, panel);
+        usleep(100 * 1000);
+      }
+
+      while (digitalRead(28) == 0 && moveLock != 2 && tetromino == currentTetromino) {
+        board->moveTetrominoLeft(tetromino);
+        board->showBoard(tetromino, panel);
+        usleep(62 * 1000);
+      }
+
+      if (digitalRead(28) == 1) {
+        moveLock = 0;
+        canGrabMoveLock = true;
+      }
+    }
+  }
+}
+
+static void checkForMoveRight(Canvas *panel, Board *board, Tetromino *tetromino) {
+  bool canGrabMoveLock = true;
+
+  while (tetromino == currentTetromino) {
+    if (moveLock != 1 && canGrabMoveLock) {
+      if (digitalRead(29) == 0) {
+
+        moveLock = 2;
+        canGrabMoveLock = false;
+
+
+        board->moveTetrominoRight(tetromino);
+        board->showBoard(tetromino, panel);
+        usleep(100 * 1000);
+      }
+
+      while (digitalRead(29) == 0 && moveLock != 1 && tetromino == currentTetromino) {
+        board->moveTetrominoRight(tetromino);
+        board->showBoard(tetromino, panel);
+        usleep(62 * 1000);
+      }
+
+      if (digitalRead(29) == 1) {
+        moveLock = 0;
+        canGrabMoveLock = true;
+      }
+    }
+  }
+}
+
 static void playGame(Canvas *panel, Board *board) {
   //board->printBoard();
 
   for (int i = 0; i < 7; i++) {
     if (interrupt_received)
       return;
-    Tetromino *tetromino = getNextTetromino(i);
+    currentTetromino = getNextTetromino(i);
 
-    board->spawnTetromino(tetromino);
-    board->showBoard(tetromino, panel);
+    thread checkMove(checkForMove, panel, board, currentTetromino);
+    checkMove.detach();
+
+//    moveLock = 0;
+//
+//    thread checkMoveLeft(checkForMoveLeft, panel, board, currentTetromino);
+//    checkMoveLeft.detach();
+//
+//    thread checkMoveRight(checkForMoveRight, panel, board, currentTetromino);
+//    checkMoveRight.detach();
+
+    //board->spawnTetromino(tetromino);
+    board->showBoard(currentTetromino, panel);
 
     cout.flush();
-    usleep(100 * 1000);
-    while (board->moveTetrominoDown(tetromino)) {
-      if (interrupt_received)
-        return;
-      board->showBoard(tetromino, panel);
+    usleep(500 * 1000);
+    while (board->moveTetrominoDown(currentTetromino)) {
+      board->showBoard(currentTetromino, panel);
       cout.flush();
-      usleep(100 * 1000);
+      usleep(500 * 1000);
     }
 
-    board->showBoard(tetromino, panel);
+    board->showBoard(currentTetromino, panel);
   }
 
-  while (true) {
-    if (interrupt_received)
-      return;
-  }
+//  while (true) {
+//    if (interrupt_received)
+//      return;
+//  }
 
 //  board->printBoard();
 }
@@ -141,6 +228,12 @@ static Canvas *setUpPanel(int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
+  wiringPiSetup();
+  pinMode(28, INPUT);
+  pullUpDnControl(28, PUD_UP);
+  pinMode(29, INPUT);
+  pullUpDnControl(29, PUD_UP);
+
   srand(time(NULL));
 
   Canvas *panel = setUpPanel(argc, argv);
@@ -148,14 +241,21 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  Board *board = new Board();
+  while (true) {
+    Board *board = new Board();
 
-  playGame(panel, board);    // Using the canvas.
+    playGame(panel, board);    // Using the canvas.
+
+    delete board;
+
+    if (interrupt_received)
+      break;
+  }
 
   // Animation finished. Shut down the RGB matrix.
   panel->Clear();
   delete panel;
-  delete board;
+  //delete board;
 
   return 0;
 }

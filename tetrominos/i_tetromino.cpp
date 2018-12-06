@@ -50,3 +50,29 @@ const int ITetromino::getNumRows() {
 const int ITetromino::getNumCols() {
   return ITetromino::numCols;
 }
+
+void ITetromino::rotateLeft() {
+  switch (this->orientation) {
+    case 1:
+      this->orientation = 4;
+    case 2:
+      this->orientation = 1;
+    case 3:
+      this->orientation = 2;
+    default:
+      this->orientation = 3;
+  }
+}
+
+void ITetromino::rotateRight() {
+  switch (this->orientation) {
+    case 1:
+      this->orientation = 2;
+    case 2:
+      this->orientation = 3;
+    case 3:
+      this->orientation = 4;
+    default:
+      this->orientation = 1;
+  }
+}

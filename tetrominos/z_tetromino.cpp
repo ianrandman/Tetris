@@ -46,3 +46,29 @@ const int ZTetromino::getNumRows() {
 const int ZTetromino::getNumCols() {
   return ZTetromino::numCols;
 }
+
+void ZTetromino::rotateLeft() {
+  switch (this->orientation) {
+    case 1:
+      this->orientation = 4;
+    case 2:
+      this->orientation = 1;
+    case 3:
+      this->orientation = 2;
+    default:
+      this->orientation = 3;
+  }
+}
+
+void ZTetromino::rotateRight() {
+  switch (this->orientation) {
+    case 1:
+      this->orientation = 2;
+    case 2:
+      this->orientation = 3;
+    case 3:
+      this->orientation = 4;
+    default:
+      this->orientation = 1;
+  }
+}

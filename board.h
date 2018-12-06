@@ -16,6 +16,8 @@ class Board {
   Board();
   void spawnTetromino(Tetromino *tetromino);
   bool moveTetrominoDown(Tetromino *tetromino);
+  void moveTetrominoLeft(Tetromino *tetromino);
+  void moveTetrominoRight(Tetromino *tetromino);
   void showBoard(Tetromino *tetromino, Canvas *panel);
   void printBoard();
  private:

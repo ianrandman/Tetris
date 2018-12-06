@@ -8,6 +8,8 @@ class LTetromino : public Tetromino {
   const Coordinate *getCoordinateArray();
   const int getNumRows();
   const int getNumCols();
+  void rotateRight();
+  void rotateLeft();
  private:
   static const Color color;
 

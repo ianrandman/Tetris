@@ -46,3 +46,29 @@ const int STetromino::getNumRows() {
 const int STetromino::getNumCols() {
   return STetromino::numCols;
 }
+
+void STetromino::rotateLeft() {
+  switch (this->orientation) {
+    case 1:
+      this->orientation = 4;
+    case 2:
+      this->orientation = 1;
+    case 3:
+      this->orientation = 2;
+    default:
+      this->orientation = 3;
+  }
+}
+
+void STetromino::rotateRight() {
+  switch (this->orientation) {
+    case 1:
+      this->orientation = 2;
+    case 2:
+      this->orientation = 3;
+    case 3:
+      this->orientation = 4;
+    default:
+      this->orientation = 1;
+  }
+}
