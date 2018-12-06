@@ -7,7 +7,7 @@ using namespace std;
 
 TetrominoRotator::TetrominoRotator(Board *board) : board(board) {}
 
-void TetrominoRotator::attemptRotate(Tetromino *tetromino) {
+bool TetrominoRotator::attemptRotate(Tetromino *tetromino) {
   if (typeid(*tetromino) == typeid(OTetromino)) {
   } else if (typeid(*tetromino) == typeid(ITetromino)) {
     tetromino->rotateRight();
@@ -25,6 +25,7 @@ void TetrominoRotator::attemptRotate(Tetromino *tetromino) {
                 if (board->isCollision(tetromino )) {
                   tetromino->moveCurrentLocation(2, -1);
                   tetromino->rotateLeft();
+                  return false;
                 }
               }
             }
@@ -44,6 +45,7 @@ void TetrominoRotator::attemptRotate(Tetromino *tetromino) {
                 if (board->isCollision(tetromino )) {
                   tetromino->moveCurrentLocation(-1, -2);
                   tetromino->rotateLeft();
+                  return false;
                 }
               }
             }
@@ -63,6 +65,7 @@ void TetrominoRotator::attemptRotate(Tetromino *tetromino) {
                 if (board->isCollision(tetromino )) {
                   tetromino->moveCurrentLocation(-2, 1);
                   tetromino->rotateLeft();
+                  return false;
                 }
               }
             }
@@ -82,6 +85,7 @@ void TetrominoRotator::attemptRotate(Tetromino *tetromino) {
                 if (board->isCollision(tetromino )) {
                   tetromino->moveCurrentLocation(1, 2);
                   tetromino->rotateLeft();
+                  return false;
                 }
               }
             }
@@ -105,6 +109,7 @@ void TetrominoRotator::attemptRotate(Tetromino *tetromino) {
                 if (board->isCollision(tetromino )) {
                   tetromino->moveCurrentLocation(-2, 1);
                   tetromino->rotateLeft();
+                  return false;
                 }
               }
             }
@@ -124,6 +129,7 @@ void TetrominoRotator::attemptRotate(Tetromino *tetromino) {
                 if (board->isCollision(tetromino )) {
                   tetromino->moveCurrentLocation(2, -1);
                   tetromino->rotateLeft();
+                  return false;
                 }
               }
             }
@@ -143,6 +149,7 @@ void TetrominoRotator::attemptRotate(Tetromino *tetromino) {
                 if (board->isCollision(tetromino )) {
                   tetromino->moveCurrentLocation(-2, -1);
                   tetromino->rotateLeft();
+                  return false;
                 }
               }
             }
@@ -162,6 +169,7 @@ void TetrominoRotator::attemptRotate(Tetromino *tetromino) {
                 if (board->isCollision(tetromino )) {
                   tetromino->moveCurrentLocation(+2, 1);
                   tetromino->rotateLeft();
+                  return false;
                 }
               }
             }
@@ -170,4 +178,6 @@ void TetrominoRotator::attemptRotate(Tetromino *tetromino) {
         break;
     }
   }
+
+  return true;
 }

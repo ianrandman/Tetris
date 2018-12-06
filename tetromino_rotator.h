@@ -19,7 +19,7 @@ class TetrominoRotator {
  public:
   TetrominoRotator(Board *board);
 
-  void attemptRotate(Tetromino *tetromino);
+  bool attemptRotate(Tetromino *tetromino);
 
  private:
   Board *board;

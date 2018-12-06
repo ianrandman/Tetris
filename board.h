@@ -17,17 +17,16 @@ class Board {
   void spawnTetromino(Tetromino *tetromino);
 
   bool isCollision(Tetromino *tetromino);
+  void solidifyTetromino(Tetromino *tetromino);
 
   bool moveTetrominoDown(Tetromino *tetromino);
-  void moveTetrominoLeft(Tetromino *tetromino);
-  void moveTetrominoRight(Tetromino *tetromino);
+  bool moveTetrominoLeft(Tetromino *tetromino);
+  bool moveTetrominoRight(Tetromino *tetromino);
   void showBoard(Tetromino *tetromino, Canvas *panel);
   void printBoard();
  private:
   static const int numRows = 22;
   Line lines[numRows];
-
-  void solidifyTetromino(Tetromino *tetromino);
 };
 
 #endif

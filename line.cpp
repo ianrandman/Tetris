@@ -37,12 +37,29 @@ void Line::showSpaces(Canvas *panel) {
 }
 
 void Line::printLine() {
-  for (int col = 0; col < 10; col++) {
+  for (int col = 0; col < Line::numSpaces; col++) {
     Coordinate space = spaces[col];
     if (space.isOccupied()) {
       cout << "X";
     } else {
       cout << "O";
     }
+  }
+}
+
+bool Line::isFilled() {
+  for (int col = 0; col < Line::numSpaces; col++) {
+    if (!spaces[col].isOccupied()) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+void Line::lower() {
+  rowNum++;
+  for (int col = 0; col < Line::numSpaces; col++) {
+    spaces[col].setRow(rowNum + 1);
   }
 }

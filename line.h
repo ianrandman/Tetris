@@ -23,6 +23,9 @@ class Line {
   void setOccupied(Color color, int col);
   void showSpaces(Canvas *panel);
   void printLine();
+
+  bool isFilled();
+  void lower();
  private:
   int rowNum;
   Coordinate spaces[numSpaces];

@@ -32,13 +32,13 @@ using namespace std;
 
 using rgb_matrix::GPIO;
 using rgb_matrix::RGBMatrix;
-using rgb_matrix::Canvas;
+using rgb_matrix::RGBMatrix;
 
 static int lastTetromino = -1;
 static Tetromino *currentTetromino;
 
-static void playGame(Canvas *panel, Board *board, TetrominoRotator *rotator);
-static Canvas *setUpPanel(int argc, char *argv[]);
+static void playGame(RGBMatrix *panel, Board *board, TetrominoRotator *rotator);
+static RGBMatrix *setUpPanel(int argc, char *argv[]);
 static Tetromino *getNextTetromino();
 
 volatile bool interrupt_received = false;
@@ -46,16 +46,14 @@ static void InterruptHandler(int signo) {
   interrupt_received = true;
 }
 
-static Tetromino *getNextTetromino(int number) {
-//  int num = rand() % 7;
-//  if (num == lastTetromino) {
-//    num = rand() % 7;
-//  }
-//  lastTetromino = num;
+static Tetromino *getNextTetromino() {
+  int num = rand() % 7;
+  if (num == lastTetromino) {
+    num = rand() % 7;
+  }
+  lastTetromino = num;
 
-  int num = 4;
-
-  switch (number) {
+  switch (num) {
     case 0:
       return new ITetromino();
     case 1:
@@ -73,10 +71,11 @@ static Tetromino *getNextTetromino(int number) {
   }
 }
 
-static void checkForMove(Canvas *panel, Board *board, Tetromino *tetromino) {
+static bool successfulChange = false;
+static void checkForMove(RGBMatrix *panel, Board *board, Tetromino *tetromino) {
 while (tetromino == currentTetromino) {
     if (digitalRead(28) == 0) {
-      board->moveTetrominoLeft(tetromino);
+      successfulChange = board->moveTetrominoLeft(tetromino);
       //board->showBoard(tetromino, panel);
       usleep(150 * 1000);
     }
@@ -86,13 +85,13 @@ while (tetromino == currentTetromino) {
         break;
       }
 
-      board->moveTetrominoLeft(tetromino);
+      successfulChange = board->moveTetrominoLeft(tetromino);
       //board->showBoard(tetromino, panel);
       usleep(62 * 1000);
     }
 
     if (digitalRead(29) == 0) {
-      board->moveTetrominoRight(tetromino);
+      successfulChange = board->moveTetrominoRight(tetromino);
       //board->showBoard(tetromino, panel);
       usleep(150 * 1000);
     }
@@ -102,7 +101,7 @@ while (tetromino == currentTetromino) {
         break;
       }
 
-      board->moveTetrominoRight(tetromino);
+      successfulChange = board->moveTetrominoRight(tetromino);
       //board->showBoard(tetromino, panel);
       usleep(62 * 1000);
     }
@@ -110,7 +109,7 @@ while (tetromino == currentTetromino) {
 }
 
 static int moveLock = 0;
-static void checkForMoveLeft(Canvas *panel, Board *board, Tetromino *tetromino) {
+static void checkForMoveLeft(RGBMatrix *panel, Board *board, Tetromino *tetromino) {
   bool canGrabMoveLock = true;
 
   while (tetromino == currentTetromino) {
@@ -140,7 +139,7 @@ static void checkForMoveLeft(Canvas *panel, Board *board, Tetromino *tetromino) 
   }
 }
 
-static void checkForMoveRight(Canvas *panel, Board *board, Tetromino *tetromino) {
+static void checkForMoveRight(RGBMatrix *panel, Board *board, Tetromino *tetromino) {
   bool canGrabMoveLock = true;
 
   while (tetromino == currentTetromino) {
@@ -171,18 +170,18 @@ static void checkForMoveRight(Canvas *panel, Board *board, Tetromino *tetromino)
 }
 
 static int timesPressed = 0;
-static void checkForRotate(Canvas *panel, Board *board, Tetromino *tetromino, TetrominoRotator *rotator) {
+static void checkForRotate(RGBMatrix *panel, Board *board, Tetromino *tetromino, TetrominoRotator *rotator) {
   bool canAttemptRotate = true;
 
   while (tetromino == currentTetromino) {
     if (digitalRead(27) == 0 && canAttemptRotate) {
-      rotator->attemptRotate(tetromino);
+      successfulChange = rotator->attemptRotate(tetromino);
       //board->showBoard(tetromino, panel);
       canAttemptRotate = false;
       usleep(200 * 1000);
 
       timesPressed++;
-      cout << "i was just pressed for the " << timesPressed << "times" << endl;
+      //cout << "i was just pressed for the " << timesPressed << "times" << endl;
     }
 
     if (digitalRead(27) == 1){
@@ -191,21 +190,33 @@ static void checkForRotate(Canvas *panel, Board *board, Tetromino *tetromino, Te
   }
 }
 
-static void showBoard(Canvas *panel, Board *board) {
+static void showBoard(RGBMatrix *panel, Board *board) {
   while (true) {
     board->showBoard(currentTetromino, panel);
     usleep(100 * 1000);
   }
 }
 
-static void playGame(Canvas *panel, Board *board, TetrominoRotator *rotator) {
+static void movePieceDown(Board *board) {
+  while (board->moveTetrominoDown(currentTetromino)) {
+    //board->showBoard(currentTetromino, panel);
+    cout.flush();
+    usleep(200 * 1000);
+
+    if (interrupt_received)
+      return;
+  }
+}
+
+static void playGame(RGBMatrix *panel, Board *board, TetrominoRotator *rotator) {
   //board->printBoard();
-  currentTetromino = getNextTetromino(0);
+  currentTetromino = getNextTetromino();
   thread showTheBoard(showBoard, panel, board);
   showTheBoard.detach();
 
-  for (int i = 1; i < 7; i++) {
-    cout << timesPressed << endl;
+  //for (int i = 1; i < 7; i++) {
+  while (true) {
+    //cout << timesPressed << endl;
     if (interrupt_received)
       return;
 
@@ -228,15 +239,20 @@ static void playGame(Canvas *panel, Board *board, TetrominoRotator *rotator) {
 
     cout.flush();
     usleep(200 * 1000);
-    while (board->moveTetrominoDown(currentTetromino)) {
-      //board->showBoard(currentTetromino, panel);
-      cout.flush();
-      usleep(200 * 1000);
+    movePieceDown(board);
+
+    while (successfulChange) {
+      successfulChange = false;
+      if (board->moveTetrominoDown(currentTetromino)) {
+        movePieceDown(board);
+      }
+      usleep (500 * 1000);
     }
+    board->solidifyTetromino(currentTetromino);
 
     //board->showBoard(currentTetromino, panel);
 
-    currentTetromino = getNextTetromino(i);
+    currentTetromino = getNextTetromino();
   }
 
 //  while (true) {
@@ -247,22 +263,22 @@ static void playGame(Canvas *panel, Board *board, TetrominoRotator *rotator) {
 //  board->printBoard();
 }
 
-static Canvas *setUpPanel(int argc, char *argv[]) {
+static RGBMatrix *setUpPanel(int argc, char *argv[]) {
   RGBMatrix::Options defaults;
   defaults.hardware_mapping = "regular";  // or e.g. "adafruit-hat"
   defaults.rows = 32;
   defaults.chain_length = 1;
   defaults.parallel = 1;
   defaults.show_refresh_rate = false;
-  Canvas *canvas = rgb_matrix::CreateMatrixFromFlags(&argc, &argv, &defaults);
+  RGBMatrix *RGBMatrix = rgb_matrix::CreateMatrixFromFlags(&argc, &argv, &defaults);
 
   // It is always good to set up a signal handler to cleanly exit when we
-  // receive a CTRL-C for instance. The DrawOnCanvas() routine is looking
+  // receive a CTRL-C for instance. The DrawOnRGBMatrix() routine is looking
   // for that.
   signal(SIGTERM, InterruptHandler);
   signal(SIGINT, InterruptHandler);
 
-  return canvas;
+  return RGBMatrix;
 }
 
 int main(int argc, char *argv[]) {
@@ -276,16 +292,18 @@ int main(int argc, char *argv[]) {
 
   srand(time(NULL));
 
-  Canvas *panel = setUpPanel(argc, argv);
+  RGBMatrix *panel = setUpPanel(argc, argv);
   if (panel == NULL) {
     return 1;
   }
+
+  panel->SetBrightness(80);
 
   while (true) {
     Board *board = new Board();
     TetrominoRotator *rotator = new TetrominoRotator(board);
 
-    playGame(panel, board, rotator);    // Using the canvas.
+    playGame(panel, board, rotator);    // Using the RGBMatrix.
 
     delete board;
 

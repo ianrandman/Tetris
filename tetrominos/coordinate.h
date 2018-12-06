@@ -14,7 +14,7 @@ class Coordinate {
   void setOccupied();
   Color getColor();
   void setColor(Color color);
-
+  void setRow(int row); // used for clearing lines
  private:
   int row, col;
   bool occupied;

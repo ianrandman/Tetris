@@ -51,11 +51,13 @@ bool Board::moveTetrominoDown(Tetromino *tetromino) {
 //  lines[currentRow + 1].setTetrominoLocation(tetromino, currentCol);
 
   tetromino->moveDown();
+  //cout << "i'm here" << endl;
 
   if (isCollision(tetromino)) {
+    //cout << "now here" << endl;
     //lines[currentRow].setTetrominoLocation(tetromino, currentCol);
     tetromino->moveUp();
-    solidifyTetromino(tetromino);
+    //solidifyTetromino(tetromino);
     return false;
   }
 
@@ -63,6 +65,7 @@ bool Board::moveTetrominoDown(Tetromino *tetromino) {
 }
 
 void Board::solidifyTetromino(Tetromino *tetromino) {
+  printBoard();
   Coordinate currentTetrominoLocation = tetromino->getCurrentLocation();
   int currentRow = currentTetrominoLocation.getRow();
   int currentCol = currentTetrominoLocation.getCol();
@@ -81,29 +84,42 @@ void Board::solidifyTetromino(Tetromino *tetromino) {
     }
   }
 
+  for (int row = numRows - 1; row >= 2; row--) {
+    //cout << row << endl;
+
+    if (lines[row].isFilled()) {
+      for (int aboveRow = row - 1; aboveRow >= 2; aboveRow--) {
+        lines[aboveRow].lower();
+        lines[aboveRow + 1] = lines[aboveRow];
+      }
+      lines[2] = Line(2);
+    }
+  }
+
   //delete tetromino;
 }
 
-
-
-void Board::moveTetrominoLeft(Tetromino *tetromino) {
+bool Board::moveTetrominoLeft(Tetromino *tetromino) {
   tetromino->moveLeft();
 
   if (isCollision(tetromino)) {
-    //lines[currentRow].setTetrominoLocation(tetromino, currentCol);
     tetromino->moveRight();
+    return false;
   }
+
+  return true;
 }
 
-void Board::moveTetrominoRight(Tetromino *tetromino) {
+bool Board::moveTetrominoRight(Tetromino *tetromino) {
   tetromino->moveRight();
 
   if (isCollision(tetromino)) {
-    //lines[currentRow].setTetrominoLocation(tetromino, currentCol);
     tetromino->moveLeft();
+    return false;
   }
-}
 
+  return true;
+}
 
 void Board::showBoard(Tetromino *tetromino, Canvas *panel) {
   panel->Fill(0, 0, 0);

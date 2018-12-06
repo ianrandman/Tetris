@@ -33,3 +33,7 @@ Color Coordinate::getColor() {
 void Coordinate::setColor(Color color) {
   this->color = color;
 }
+
+void Coordinate::setRow(int row) {
+  this->row = row;
+}
