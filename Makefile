@@ -1,7 +1,7 @@
 CXXFLAGS=-Wall -O3 -g
-OBJECTS=game.o board.o line.o $(TETROMINODIR)/color.o $(TETROMINODIR)/coordinate.o $(TETROMINODIR)/i_tetromino.o \
-$(TETROMINODIR)/j_tetromino.o $(TETROMINODIR)/l_tetromino.o $(TETROMINODIR)/o_tetromino.o $(TETROMINODIR)/s_tetromino.o \
-$(TETROMINODIR)/t_tetromino.o $(TETROMINODIR)/tetromino.o $(TETROMINODIR)/z_tetromino.o
+OBJECTS=game.o board.o line.o tetromino_rotator.o $(TETROMINODIR)/color.o $(TETROMINODIR)/coordinate.o \
+$(TETROMINODIR)/i_tetromino.o $(TETROMINODIR)/j_tetromino.o $(TETROMINODIR)/l_tetromino.o $(TETROMINODIR)/o_tetromino.o \
+$(TETROMINODIR)/s_tetromino.o $(TETROMINODIR)/t_tetromino.o $(TETROMINODIR)/tetromino.o $(TETROMINODIR)/z_tetromino.o
 BINARIES=game
 
 TETROMINODIR=tetrominos

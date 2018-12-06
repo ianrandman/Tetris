@@ -11,8 +11,6 @@ class Tetromino {
   virtual const Coordinate *getCoordinateArray() = 0;
   virtual const int getNumRows() = 0;
   virtual const int getNumCols() = 0;
-  virtual void rotateRight() = 0;
-  virtual void rotateLeft() = 0;
 
   Coordinate getCurrentLocation();
   void setCurrentLocation(Coordinate location);
@@ -20,14 +18,14 @@ class Tetromino {
   void moveDown();
   void moveLeft();
   void moveRight();
+  void rotateRight();
+  void rotateLeft();
+  void moveCurrentLocation(int deltaRow, int deltaCol);
+  int getOrientation();
  protected:
   int orientation;
   Coordinate currentLocation;
-
-
  private:
-
-
 };
 
 #endif

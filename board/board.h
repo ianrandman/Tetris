@@ -4,8 +4,8 @@
 #include "led-matrix.h"
 
 #include "line.h"
-#include "tetrominos/tetromino.h"
-#include "tetrominos/coordinate.h"
+#include "../tetrominos/tetromino.h"
+#include "../tetrominos/coordinate.h"
 
 using rgb_matrix::GPIO;
 using rgb_matrix::RGBMatrix;
@@ -15,9 +15,6 @@ class Board {
  public:
   Board();
   void spawnTetromino(Tetromino *tetromino);
-
-  bool isCollision(Tetromino *tetromino);
-
   bool moveTetrominoDown(Tetromino *tetromino);
   void moveTetrominoLeft(Tetromino *tetromino);
   void moveTetrominoRight(Tetromino *tetromino);
@@ -27,6 +24,7 @@ class Board {
   static const int numRows = 22;
   Line lines[numRows];
 
+  bool isCollision(Tetromino *tetromino);
   void solidifyTetromino(Tetromino *tetromino);
 };
 

@@ -19,9 +19,3 @@ const int OTetromino::getNumRows() {
 const int OTetromino::getNumCols() {
   return OTetromino::numCols;
 }
-
-void OTetromino::rotateLeft() {
-}
-
-void OTetromino::rotateRight() {
-}

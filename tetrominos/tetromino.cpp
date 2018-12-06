@@ -14,28 +14,38 @@ void Tetromino::setCurrentLocation(Coordinate location) {
   currentLocation = location;
 }
 
-void Tetromino::moveUp() {
+void Tetromino::moveCurrentLocation(int deltaRow, int deltaCol) {
   int currentRow = currentLocation.getRow();
   int currentCol = currentLocation.getCol();
-  currentLocation = Coordinate(currentRow - 1, currentCol, Color::Black);
+  currentLocation = Coordinate(currentRow + deltaRow, currentCol + deltaCol, Color::Black);
+}
+
+void Tetromino::moveUp() {
+  moveCurrentLocation(-1,0);
 }
 
 void Tetromino::moveDown() {
-  int currentRow = currentLocation.getRow();
-  int currentCol = currentLocation.getCol();
-  currentLocation = Coordinate(currentRow + 1, currentCol, Color::Black);
+  moveCurrentLocation(1, 0);
 }
 
 void Tetromino::moveLeft() {
-  int currentRow = currentLocation.getRow();
-  int currentCol = currentLocation.getCol();
-  currentLocation = Coordinate(currentRow, currentCol - 1, Color::Black);
+  moveCurrentLocation(0, -1);
 }
 
 void Tetromino::moveRight() {
-  int currentRow = currentLocation.getRow();
-  int currentCol = currentLocation.getCol();
-  currentLocation = Coordinate(currentRow, currentCol + 1, Color::Black);
+  moveCurrentLocation(0, 1);
+}
+
+void Tetromino::rotateLeft() {
+  orientation = (orientation - 1) % 4;
+}
+
+void Tetromino::rotateRight() {
+  orientation = (orientation + 1) % 4;
+}
+
+int Tetromino::getOrientation() {
+  return orientation;
 }
 
 /*const Coordinate** Tetromino::getLocalArray() {

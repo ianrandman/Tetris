@@ -11,6 +11,7 @@
 
 #include "board.h"
 #include "line.h"
+#include "tetromino_rotator.h"
 
 #include "tetrominos/tetromino.h"
 #include "tetrominos/i_tetromino.h"
@@ -26,6 +27,7 @@
 #include <iostream>
 #include <thread>
 
+
 using namespace std;
 
 using rgb_matrix::GPIO;
@@ -35,7 +37,7 @@ using rgb_matrix::Canvas;
 static int lastTetromino = -1;
 static Tetromino *currentTetromino;
 
-static void playGame(Canvas *panel, Board *board);
+static void playGame(Canvas *panel, Board *board, TetrominoRotator *rotator);
 static Canvas *setUpPanel(int argc, char *argv[]);
 static Tetromino *getNextTetromino();
 
@@ -75,7 +77,7 @@ static void checkForMove(Canvas *panel, Board *board, Tetromino *tetromino) {
 while (tetromino == currentTetromino) {
     if (digitalRead(28) == 0) {
       board->moveTetrominoLeft(tetromino);
-      board->showBoard(tetromino, panel);
+      //board->showBoard(tetromino, panel);
       usleep(150 * 1000);
     }
 
@@ -85,13 +87,13 @@ while (tetromino == currentTetromino) {
       }
 
       board->moveTetrominoLeft(tetromino);
-      board->showBoard(tetromino, panel);
-      usleep(150 * 1000);
+      //board->showBoard(tetromino, panel);
+      usleep(62 * 1000);
     }
 
     if (digitalRead(29) == 0) {
       board->moveTetrominoRight(tetromino);
-      board->showBoard(tetromino, panel);
+      //board->showBoard(tetromino, panel);
       usleep(150 * 1000);
     }
 
@@ -101,7 +103,7 @@ while (tetromino == currentTetromino) {
       }
 
       board->moveTetrominoRight(tetromino);
-      board->showBoard(tetromino, panel);
+      //board->showBoard(tetromino, panel);
       usleep(62 * 1000);
     }
   }
@@ -168,16 +170,50 @@ static void checkForMoveRight(Canvas *panel, Board *board, Tetromino *tetromino)
   }
 }
 
-static void playGame(Canvas *panel, Board *board) {
-  //board->printBoard();
+static int timesPressed = 0;
+static void checkForRotate(Canvas *panel, Board *board, Tetromino *tetromino, TetrominoRotator *rotator) {
+  bool canAttemptRotate = true;
 
-  for (int i = 0; i < 7; i++) {
+  while (tetromino == currentTetromino) {
+    if (digitalRead(27) == 0 && canAttemptRotate) {
+      rotator->attemptRotate(tetromino);
+      //board->showBoard(tetromino, panel);
+      canAttemptRotate = false;
+      usleep(200 * 1000);
+
+      timesPressed++;
+      cout << "i was just pressed for the " << timesPressed << "times" << endl;
+    }
+
+    if (digitalRead(27) == 1){
+      canAttemptRotate = true;
+    }
+  }
+}
+
+static void showBoard(Canvas *panel, Board *board) {
+  while (true) {
+    board->showBoard(currentTetromino, panel);
+    usleep(100 * 1000);
+  }
+}
+
+static void playGame(Canvas *panel, Board *board, TetrominoRotator *rotator) {
+  //board->printBoard();
+  currentTetromino = getNextTetromino(0);
+  thread showTheBoard(showBoard, panel, board);
+  showTheBoard.detach();
+
+  for (int i = 1; i < 7; i++) {
+    cout << timesPressed << endl;
     if (interrupt_received)
       return;
-    currentTetromino = getNextTetromino(i);
 
     thread checkMove(checkForMove, panel, board, currentTetromino);
     checkMove.detach();
+
+    thread checkRotate(checkForRotate, panel, board, currentTetromino, rotator);
+    checkRotate.detach();
 
 //    moveLock = 0;
 //
@@ -188,17 +224,19 @@ static void playGame(Canvas *panel, Board *board) {
 //    checkMoveRight.detach();
 
     //board->spawnTetromino(tetromino);
-    board->showBoard(currentTetromino, panel);
+    //board->showBoard(currentTetromino, panel);
 
     cout.flush();
-    usleep(500 * 1000);
+    usleep(200 * 1000);
     while (board->moveTetrominoDown(currentTetromino)) {
-      board->showBoard(currentTetromino, panel);
+      //board->showBoard(currentTetromino, panel);
       cout.flush();
-      usleep(500 * 1000);
+      usleep(200 * 1000);
     }
 
-    board->showBoard(currentTetromino, panel);
+    //board->showBoard(currentTetromino, panel);
+
+    currentTetromino = getNextTetromino(i);
   }
 
 //  while (true) {
@@ -215,7 +253,7 @@ static Canvas *setUpPanel(int argc, char *argv[]) {
   defaults.rows = 32;
   defaults.chain_length = 1;
   defaults.parallel = 1;
-  defaults.show_refresh_rate = true;
+  defaults.show_refresh_rate = false;
   Canvas *canvas = rgb_matrix::CreateMatrixFromFlags(&argc, &argv, &defaults);
 
   // It is always good to set up a signal handler to cleanly exit when we
@@ -229,6 +267,8 @@ static Canvas *setUpPanel(int argc, char *argv[]) {
 
 int main(int argc, char *argv[]) {
   wiringPiSetup();
+  pinMode(27, INPUT);
+  pullUpDnControl(27, PUD_UP);
   pinMode(28, INPUT);
   pullUpDnControl(28, PUD_UP);
   pinMode(29, INPUT);
@@ -243,8 +283,9 @@ int main(int argc, char *argv[]) {
 
   while (true) {
     Board *board = new Board();
+    TetrominoRotator *rotator = new TetrominoRotator(board);
 
-    playGame(panel, board);    // Using the canvas.
+    playGame(panel, board, rotator);    // Using the canvas.
 
     delete board;
 
